@@ -121,6 +121,8 @@ sub has_module($) {
 			=> '--with-http_auth_request_module',
 		realip	=> '--with-http_realip_module',
 		sub	=> '--with-http_sub_module',
+		dynamic_conf => '--with-dynamic-conf',
+		aio	=> '--with-file-aio',
 		charset	=> '(?s)^(?!.*--without-http_charset_module)',
 		gzip	=> '(?s)^(?!.*--without-http_gzip_module)',
 		ssi	=> '(?s)^(?!.*--without-http_ssi_module)',
@@ -532,6 +534,17 @@ sub reload() {
 	} else {
 		kill 'HUP', $pid;
 	}
+
+	return $self;
+}
+
+sub update() {
+	my ($self) = @_;
+
+	return $self unless $self->{_started};
+	return $self if $^O eq 'MSWin32';
+
+	kill 'URG', $self->read_file('nginx.pid');
 
 	return $self;
 }
