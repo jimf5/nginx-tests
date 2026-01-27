@@ -108,19 +108,16 @@ $t->write_file('password', 'localhost');
 $t->write_file('password_many', "wrong$CRLF" . "localhost$CRLF");
 $t->write_file('password_stream', 'inherits');
 
-my $p = fork();
-exec("echo localhost > $d/password_fifo") if $p == 0;
+$t->run_daemon(sub {$t->write_file("password_fifo", "localhost\n") while 1;});
+open $_, "<$d/password_fifo" or die $!;
 
-$t->run_daemon(\&http_daemon);
+$t->run_daemon(\&http_daemon)->waitforsocket('127.0.0.1:' . port(8081));
 
 eval {
 	open OLDERR, ">&", \*STDERR; close STDERR;
 	$t->run();
 	open STDERR, ">&", \*OLDERR;
-};
-kill 'INT', $p if $@;
-
-$t->waitforsocket('127.0.0.1:' . port(8081));
+} || die "Failed to run nginx: $@\n";
 
 ###############################################################################
 

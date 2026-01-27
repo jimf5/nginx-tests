@@ -163,6 +163,7 @@ foreach my $name ('root.crt', 'root.crl', '1.example.com.crt',
 {
 	mkfifo("$d/$name.fifo", 0700);
 	$t->run_daemon(\&fifo_writer_daemon, $t, $name);
+	open $_, "<$d/$name.fifo" or die $!;
 }
 
 $t->write_file('t', '');
@@ -210,7 +211,7 @@ sub fifo_writer_daemon {
 	my $content = $t->read_file($name);
 
 	while (1) {
-		$t->write_file("$name.fifo", $content);
+		$t->write_file("$name.fifo", $content."\n");
 		# reset content after the first read
 		$content = "";
 	}
