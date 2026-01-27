@@ -37,8 +37,8 @@ events {
 http {
     %%TEST_GLOBALS_HTTP%%
 
-    connection_pool_size 128;
-    client_header_buffer_size 128;
+    connection_pool_size 144;
+    client_header_buffer_size 144;
 
     server {
         listen       127.0.0.1:8080;

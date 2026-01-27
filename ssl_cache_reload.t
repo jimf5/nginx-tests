@@ -131,7 +131,8 @@ sub reload {
 	$t->reload();
 
 	for (1 .. 30) {
-		return 1 if $t->read_file('error.log') =~ /exited with code/;
+		return 1 if
+			$t->read_file('error.log') =~ /(cycle exit)|(exited with code)/;
 		select undef, undef, undef, 0.2;
 	}
 }
